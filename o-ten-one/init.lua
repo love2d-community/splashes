@@ -230,8 +230,14 @@ end
 function splashlib:draw()
   local width, height = love.graphics.getDimensions()
 
-  love.graphics.clear(colors.bg)
   self.canvas:renderTo(function()
+    love.graphics.clear(colors.bg)
+
+    if self.stripes.offset == 0 then
+      love.graphics.setColor(colors.shadow)
+      love.graphics.circle("fill", width / 2 + 2, height / 2 + 2, self.stripes.radius, self.stripes.radius * 80)
+    end
+
     love.graphics.push()
     love.graphics.translate(width / 2, height / 2)
 
@@ -258,8 +264,26 @@ function splashlib:draw()
 
     love.graphics.pop()
 
-    love.graphics.setColor(255, 255, 255, 255*self.heart.scale)
+    love.graphics.setColor(colors.white)
     love.graphics.draw(self.heart.sprite, 0, 5, self.heart.rot, self.heart.scale, self.heart.scale, 43, 39)
+    love.graphics.pop()
+
+    love.graphics.push()
+    love.graphics.setShader(self.textshader)
+    love.graphics.draw(self.text.obj,
+      (width  / 2) - (self.text.obj:getWidth()  / 2),
+      (height / 2) - (self.text.obj:getHeight() / 2) + (height / 6))
+    --love.graphics.setShader()
+    love.graphics.pop()
+
+    love.graphics.push()
+    love.graphics.setShader(self.logoshader)
+    love.graphics.draw(self.logo.sprite, 
+      (width  / 2) - (self.logo.sprite:getWidth()  / 2 * 0.5), 
+      (height / 2) + (self.logo.sprite:getHeight() / 2 * 0.5) + (height / 10), 
+      0.0, 
+      0.5, 0.5)
+    love.graphics.setShader()
     love.graphics.pop()
   end)
 
