@@ -1,7 +1,7 @@
-local splashlib = require "o-ten-one"
+local o_ten_one = require "o-ten-one"
 
 function love.load()
-  splash = splashlib.new()
+  splash = o_ten_one.new()
   splash.onDone = love.load
 end
 
