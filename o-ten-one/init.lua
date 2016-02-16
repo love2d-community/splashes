@@ -26,7 +26,7 @@ local current_folder = (...):gsub('%.[^%.]+$', '')
 local timer = require(current_folder..".timer")
 
 local colors = {
-  bg =     { 141, 178, 210, 255 },
+  bg =     { 108, 190, 228, 255 },
   white =  { 255, 255, 255, 255 },
   blue =   {  39, 170, 225, 255 },
   pink =   { 231,  74, 153, 255 },
