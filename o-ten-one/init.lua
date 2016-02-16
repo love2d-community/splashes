@@ -1,7 +1,7 @@
 local splashlib = {
-  _VERSION     = 'v1.0.1',
-  _DESCRIPTION = 'a 0.10.1 splash',
-  _URL         = 'https://github.com/love2d-community/splashes',
+  _VERSION     = "v1.0.2",
+  _DESCRIPTION = "a 0.10.1 splash",
+  _URL         = "https://github.com/love2d-community/splashes",
   _LICENSE     = [[Copyright (c) 2016 love-community members (as per git commits in repository above)
 
 This software is provided 'as-is', without any express or implied
@@ -18,10 +18,12 @@ freely, subject to the following restrictions:
    appreciated but is not required.
 2. Altered source versions must be plainly marked as such, and must not be
    misrepresented as being the original software.
-3. This notice may not be removed or altered from any source distribution.]]
+3. This notice may not be removed or altered from any source distribution.
+
+The font used in this splash is "Handy Andy" by www.andrzejgdula.com]]
 }
 
-local current_folder = (...):gsub('%.[^%.]+$', '')
+local current_folder = (...):gsub("%.[^%.]+$", "")
 
 local timer = require(current_folder..".timer")
 
@@ -43,13 +45,13 @@ function splashlib.new()
   extern number blur;
   extern number shadow;
 
-  vec4 effect(vec4 color, Image canvas, vec2 tc, vec2 _)
+  vec4 effect(vec4 global_color, Image canvas, vec2 tc, vec2 _)
   {
     // radial mask
-    color = Texel(canvas, tc);
+    vec4 color = Texel(canvas, tc);
     number r = length((tc - vec2(.5)) * love_ScreenSize.xy);
     number s = smoothstep(radius+blur, radius-blur, r);
-    color.a *= s;
+    color.a *= s * global_color.a;
 
     // add shadow on lower diagonal along the circle
     number sr = 7. * (1. - smoothstep(-.1,.04,(1.-tc.x)-tc.y));
@@ -58,28 +60,84 @@ function splashlib.new()
     return color - vec4(1, 1, 1, 0) * (1-s);
   }
   ]]
-  local ssend = self.shader.send
-  getmetatable(self.shader).send = function(self, ...) pcall(ssend, self, ...) end
-  self.shader:send("radius", math.max(width*height))
-  self.shader:send("blur", 1)
-  self.shader:send("shadow", 0.2)
+
+  -- this shader makes the text appear from left to right
+  self.textshader = love.graphics.newShader[[
+  extern number alpha;
+
+  vec4 effect(vec4 color, Image logo, vec2 tc, vec2 sc)
+  {
+    //Probably would be better to just use the texture's dimensions instead; faster reaction.
+    vec2 sd = sc / love_ScreenSize.xy;
+
+    if (sd.x <= alpha) {
+      return color * Texel(logo, tc);
+    }
+    return vec4(0);
+  }
+  ]]
+
+  -- this shader applies a stroke effect on the logo using a gradient mask
+  self.logoshader = love.graphics.newShader[[
+  //Using the pen extern, only draw out pixels that have their color below a certain treshold.
+  //Since pen will eventually equal 1.0, the full logo will be drawn out.
+
+  extern number pen;
+  extern Image mask;
+
+  vec4 effect(vec4 color, Image logo, vec2 tc, vec2 sc)
+  {
+    number value = max(Texel(mask, tc).r, max(Texel(mask, tc).g, Texel(mask, tc).b));
+    number alpha = Texel(mask, tc).a;
+
+    //probably could be optimzied...
+    if (alpha > 0.0) {
+      if (pen >= value) {
+        return color * Texel(logo, tc);
+      }
+    }
+    return vec4(0);
+  }
+  ]]
 
   self.canvas = love.graphics.newCanvas()
 
+  self.alpha = 1
   self.heart = {
     sprite = love.graphics.newImage(current_folder .. "/heart.png"),
     scale = 0,
-    rot = 0
+    rot   = 0
   }
 
   self.stripes = {
-    rot = 0,
-    height = 100,
-    offset = -2 * width,
-    radius = math.max(width, height),
-    shadow = 0,
+    rot     = 0,
+    height  = 100,
+    offset  = -2 * width,
+    radius  = math.max(width, height),
+    shadow  = 0,
   }
 
+  self.text = {
+    obj   = love.graphics.newText(love.graphics.newFont(current_folder .. "/handy-andy.otf", 22), "made with"),
+    alpha = 0
+  }
+  self.text.width, self.text.height = self.text.obj:getDimensions()
+
+  self.logo = {
+    sprite = love.graphics.newImage(current_folder .. "/logo.png"),
+    mask   = love.graphics.newImage(current_folder .. "/logo-mask.png"),
+    pen    = 0
+  }
+  self.logo.width, self.logo.height = self.logo.sprite:getDimensions()
+
+  self.shader:send("radius",  width*height)
+  self.shader:send("blur",    1)
+  self.shader:send("shadow",  2)
+
+  self.textshader:send("alpha", 0)
+
+  self.logoshader:send("pen", 0)
+  self.logoshader:send("mask", self.logo.mask)
 
   timer.clear()
   timer.script(function(wait)
@@ -94,6 +152,8 @@ function splashlib.new()
     local haenker = timer.every(0, function()
       self.shader:send("radius", self.stripes.radius)
       self.shader:send("shadow", self.stripes.shadow)
+      self.textshader:send("alpha", self.text.alpha)
+      self.logoshader:send("pen",   self.logo.pen)
     end)
 
     -- focus the heart, desaturate the rest
@@ -101,10 +161,32 @@ function splashlib.new()
     wait(0.2)
 
     timer.tween(0.2, self.stripes, {radius = 70}, "out-back")
-    timer.tween(0.7, self.stripes, {shadow = .3}, "back")
+    timer.tween(0.7, self.stripes, {shadow = .3}, "back") -- @TODO 0.4?
+    timer.tween(0.8, self.heart, {scale = 1}, "out-elastic", nil, 1, 0.3)
 
-    timer.tween(0.7, self.heart, {scale = 1}, "out-elastic")
-    wait(0.9)
+    -- write out the text
+    timer.tween(.75, self.text, {alpha = 1}, "linear")
+
+    -- draw out the logo, in parts
+    local mult = 0.65
+    local function tween_and_wait(dur, pen, easing)
+      timer.tween(mult * dur, self.logo, {pen = pen/255}, "in-quad")
+      wait(mult * dur)
+    end
+    tween_and_wait(0.175,  50, "in-quad")     -- L
+    tween_and_wait(0.300, 100, "in-out-quad") -- O
+    tween_and_wait(0.075, 115, "out-sine")    -- first dot on O
+    tween_and_wait(0.075, 129, "out-sine")    -- second dot on O
+    tween_and_wait(0.125, 153, "in-out-quad") -- \
+    tween_and_wait(0.075, 179, "in-quad")     -- /
+    tween_and_wait(0.250, 205, "in-quart")    -- e->break
+    tween_and_wait(0.150, 230, "out-cubic")   -- e finish
+    tween_and_wait(0.150, 244, "linear")      -- ()
+    tween_and_wait(0.100, 255, "linear")      -- R
+
+    wait(0.4)
+    timer.tween(0.3, self, {alpha = 0})
+    wait(0.4)
 
     timer.clear()
 
@@ -157,12 +239,32 @@ function splashlib:draw()
     love.graphics.pop()
   end)
 
+  love.graphics.setColor(255, 255, 255, 255*self.alpha)
   love.graphics.setShader(self.shader)
   love.graphics.draw(self.canvas, 0,0)
   love.graphics.setShader()
+
+  love.graphics.push()
+  love.graphics.setShader(self.textshader)
+  love.graphics.draw(self.text.obj,
+    (width  / 2) - (self.text.width   / 2),
+    (height / 2) - (self.text.height  / 2) + (height / 10) + 62
+  )
+  love.graphics.pop()
+
+  love.graphics.push()
+  love.graphics.setShader(self.logoshader)
+  love.graphics.draw(self.logo.sprite,
+    (width  / 2) - (self.logo.width   / 4),
+    (height / 2) + (self.logo.height  / 4) + (height / 10),
+    0, 0.5, 0.5
+  )
+  love.graphics.setShader()
+  love.graphics.pop()
 end
 
 function splashlib:update(dt)
+  -- dt / 1.85
   timer.update(dt)
 end
 
