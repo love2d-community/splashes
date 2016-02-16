@@ -159,27 +159,58 @@ function splashlib.new()
   timer.clear()
   timer.script(function(wait)
     -- roll in stripes
-    timer.tween(0.5, self.stripes, {offset = 0})
-    wait(0.3)
+    timer.tween(0.5, self.stripes, {offset = 0.0})
+    wait(0.2)
 
-    timer.tween(0.3, self.stripes, {rot = -5 * math.pi / 18, height=height})
+    timer.tween(0.4, self.stripes, {rot = -50 * math.pi / 18.0, height=height})
     wait(0.2)
 
     -- hackety hack: execute timer to update shader every frame
     local haenker = timer.every(0, function()
-      self.shader:send("radius", self.stripes.radius)
-      self.shader:send("shadow", self.stripes.shadow)
+      self.shader:send("radius",  self.stripes.radius)
+      self.shader:send('lighten', self.stripes.lighten)
+      self.shader:send("shadow",  self.stripes.shadow)
+      self.textshader:send('alpha', self.text.alpha)
+      self.logoshader:send('pen',   self.logo.pen)
     end)
 
     -- focus the heart, desaturate the rest
-    timer.tween(0.2, self.stripes, {radius = 170})
+    timer.tween(0.2, self.stripes, {radius = 170.0})
+    timer.tween(0.4, self.stripes, {lighten =  0.06}, 'quad')
     wait(0.2)
 
-    timer.tween(0.2, self.stripes, {radius = 70}, "out-back")
-    timer.tween(0.7, self.stripes, {shadow = .3}, "back")
+    timer.tween(0.2, self.stripes, {radius = 70.0}, "out-back")
+    timer.tween(0.4, self.stripes, {shadow =  0.3}, "back")
 
-    timer.tween(0.7, self.heart, {scale = 1}, "out-elastic")
-    wait(0.9)
+    -- make the heart appear
+    timer.tween(1.0, self.heart, {scale = 1.0}, "out-elastic", nil, 1.0, 0.3)
+    
+    -- write out the text
+    timer.tween(2.75, self.text, {alpha = 1.0}, "linear")
+    wait(1.25)
+
+    -- draw out the logo, in parts
+    local mult = 0.65
+    timer.tween(mult * 0.175, self.logo, {pen =  50/255}, "in-quad",  function()     -- L
+    timer.tween(mult * 0.300, self.logo, {pen = 100/255}, "in-out-quad",  function() -- O
+    timer.tween(mult * 0.075, self.logo, {pen = 115/255}, "out-sine",  function()    -- first dot on O
+    timer.tween(mult * 0.075, self.logo, {pen = 129/255}, "out-sine",  function()    -- second dot on O
+    timer.tween(mult * 0.125, self.logo, {pen = 153/255}, "in-out-quad",  function() -- \
+    timer.tween(mult * 0.075, self.logo, {pen = 179/255}, "in-quad",  function()     -- /
+    timer.tween(mult * 0.250, self.logo, {pen = 205/255}, "in-quart",  function()    -- e->break
+    timer.tween(mult * 0.150, self.logo, {pen = 230/255}, "out-cubic",  function()   -- e finish
+    timer.tween(mult * 0.150, self.logo, {pen = 244/255}, "linear",  function()      -- ()
+    timer.tween(mult * 0.100, self.logo, {pen = 255/255}, "linear")                  -- R
+    end)
+    end)
+    end)
+    end)
+    end)
+    end)
+    end)
+    end) 
+    end)
+    wait(1.475*0.65)
 
     timer.clear()
 
