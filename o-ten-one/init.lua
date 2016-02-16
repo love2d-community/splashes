@@ -110,6 +110,13 @@ function splashlib.new()
 
   local ssend = self.shader.send
   getmetatable(self.shader).send = function(self, ...) pcall(ssend, self, ...) end
+
+  local ssend2 = self.textshader.send
+  getmetatable(self.textshader).send = function(self, ...) pcall(ssend2, self, ...) end
+
+  local ssend3 = self.logoshader.send
+  getmetatable(self.logoshader).send = function(self, ...) pcall(ssend3, self, ...) end
+
   self.shader:send("radius", math.max(width*height))
   self.shader:send("blur", 1)
   self.shader:send("shadow", 0.2)
