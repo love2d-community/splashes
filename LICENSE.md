@@ -1,4 +1,4 @@
-Copyright (c) 2016 love-community members
+Copyright (c) 2016 love-community members (as per git commits in repository above)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
