@@ -183,18 +183,18 @@ function splashlib.new()
     tween_and_wait(0.150, 230, "out-cubic")   -- e finish
     tween_and_wait(0.150, 244, "linear")      -- ()
     tween_and_wait(0.100, 255, "linear")      -- R
+    wait(0.4)
 
-    wait(0.4)
+    -- no more skipping
+    self.done = true
+
     timer.tween(0.3, self, {alpha = 0})
-    wait(0.4)
+    wait(0.3)
 
     timer.clear()
 
-    if not self.done and self.onDone then self.onDone() end
-    self.done = true
+    if self.onDone then self.onDone() end
   end)
-
-  self.done = false
 
   self.draw = splashlib.draw
   self.update = splashlib.update
@@ -264,15 +264,19 @@ function splashlib:draw()
 end
 
 function splashlib:update(dt)
-  -- dt / 1.85
   timer.update(dt)
 end
 
 function splashlib:skip()
-  -- @TODO: overwrite timer with smooth skipping
-  timer.clear()
-  if not self.done and self.onDone then self.onDone() end
-  self.done = true
+  if not self.done then
+    self.done = true
+
+    timer.tween(0.3, self, {alpha = 0})
+    timer.after(0.3, function ()
+      timer.clear() -- to be safe
+      if self.onDone then self.onDone() end
+    end)
+  end
 end
 
 return splashlib
