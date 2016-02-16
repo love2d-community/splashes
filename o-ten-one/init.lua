@@ -269,6 +269,7 @@ function splashlib:draw()
 end
 
 function splashlib:update(dt)
+  dt = dt / 1.85
   timer.update(dt)
 end
 
