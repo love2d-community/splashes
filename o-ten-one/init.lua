@@ -68,6 +68,23 @@ function splashlib.new()
   }
   ]]
 
+  -- this shader makes the text appear from left to right
+  textshader = love.graphics.newShader[[
+  extern number alpha;
+
+  vec4 effect(vec4 color, Image logo, vec2 tc, vec2 sc)
+  {
+    //Probably would be better to just use the texture's dimensions instead; faster reaction.
+    vec2 sd = sc / love_ScreenSize.xy;
+    //vec2 sd = sc / vec2(800.,600.);
+
+    if (sd.x <= alpha) {
+      return color * Texel(logo, tc);
+    }
+    discard;
+  }
+  ]]
+
   -- this shader applies a stroke effect on the logo using a gradient mask
   logoshader = love.graphics.newShader[[
   //Using the pen extern, only draw out pixels that have their color below a certain treshold.
