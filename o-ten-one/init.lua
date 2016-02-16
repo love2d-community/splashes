@@ -67,7 +67,30 @@ function splashlib.new()
     return color * s;
   }
   ]]
-  
+
+  -- this shader applies a stroke effect on the logo using a gradient mask
+  logoshader = love.graphics.newShader[[
+  //Using the pen extern, only draw out pixels that have their color below a certain treshold.
+  //Since pen will eventually equal 1.0, the full logo will be drawn out.
+
+  extern number pen;
+  extern Image mask;
+
+  vec4 effect(vec4 color, Image logo, vec2 tc, vec2 sc)
+  {
+    number value = max(Texel(mask, tc).r, max(Texel(mask, tc).g, Texel(mask, tc).b));
+    number alpha = Texel(mask, tc).a;
+
+    //probably could be optimzied...
+    if (alpha > 0.0) {
+      if (pen >= value) {
+        return color * Texel(logo, tc);
+      }
+    }
+    discard;
+  }
+  ]]
+
   local ssend = self.shader.send
   getmetatable(self.shader).send = function(self, ...) pcall(ssend, self, ...) end
   self.shader:send("radius", math.max(width*height))
