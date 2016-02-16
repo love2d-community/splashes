@@ -6,7 +6,7 @@ Usage
 -----
 Pick the splash you want to use from our wide variety of **1** (*one*) splashes and move the directory somewhere into your project.
 Require the file and instantiate the splash using `splash.new()`.
-Make sure to hook the love callbacks up to `splash:update(dt)` and `splash:draw()` and call `splash:skip()` to let the player skip the splash screen.
+Make sure to hook the love callbacks up to `splash:update(dt)` and `splash:draw()` and call `splash:skip()` to let the player skip the splash.
 
     local splash = require "o-ten-one"
     
@@ -30,18 +30,33 @@ Make sure to hook the love callbacks up to `splash:update(dt)` and `splash:draw(
 Splash Interface
 ----------------
 
+The library only has one function you should use:
+
+### `lib.new(...)`
+Instantiate a new `splash`.
+Parameters depend on the specific splash (see below).
+
 The following members of the `splash` variable are of importance to you as a user:
 
 ### `splash:update(dt)`
-Update the splash screen
+Update the splash.
 
 ### `splash:draw()`
-Draw the splash screen
+Draw the splash.
 
 ### `splash:skip()`
-Skip the splash screen.
+Skip the splash.
 Splash may still run an exit transition after this, wait for the `onDone()` callback to fire.
 
 ### `splash.onDone()`
 A callback you can add on the `splash` table.
 Gets called when the splash exits or is skipped.
+
+Splashes
+--------
+
+### `o-ten-one`
+Splash with the new 0.10.1 (windows) logo.
+
+`new()` parameters:
+* `background`: `{r,g,b,a}` table used to clear the screen with. Set to `false` to draw underneath.

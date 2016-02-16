@@ -35,9 +35,13 @@ local colors = {
   shadow = {   0,   0,   0, 255 / 3 }
 }
 
-function splashlib.new()
+function splashlib.new(bg)
   local self = {}
   local width, height = love.graphics.getDimensions()
+
+  if bg ~= nil then
+    colors.bg = bg
+  end
 
   -- radial mask shader
   self.shader = love.graphics.newShader[[
@@ -206,7 +210,9 @@ end
 function splashlib:draw()
   local width, height = love.graphics.getDimensions()
 
-  love.graphics.clear(colors.bg)
+  if colors.bg then
+    love.graphics.clear(colors.bg)
+  end
   self.canvas:renderTo(function()
     love.graphics.push()
     love.graphics.translate(width / 2, height / 2)
