@@ -37,27 +37,37 @@ function splashlib.new()
   local self = {}
   local width, height = love.graphics.getDimensions()
 
-  -- radial mask shader
+  -- shader lightens everything except in a circular mask
   self.shader = love.graphics.newShader[[
   extern number radius;
   extern number blur;
+  extern number lighten;
   extern number shadow;
+
+  vec4 desat(vec4 color)
+  {
+    // roughly human luminance perception
+    number g = dot(vec3(.299, .587, .114), color.rgb);
+    return vec4(g,g,g,1.0) * lighten;
+  }
 
   vec4 effect(vec4 color, Image canvas, vec2 tc, vec2 _)
   {
     // radial mask
     color = Texel(canvas, tc);
+    //TODO: scale canvas, swap l_Sc.xy to internal res vec2
     number r = length((tc - vec2(.5)) * love_ScreenSize.xy);
-    number s = smoothstep(radius+blur, radius-blur, r);
-    color.a *= s;
+    number s = smoothstep(radius-blur, radius+blur, r);
+    color = desat(color) * s + color;
 
     // add shadow on lower diagonal along the circle
-    number sr = 7. * (1. - smoothstep(-.1,.04,(1.-tc.x)-tc.y));
+    number sr = 7. * (1. - smoothstep(-.1,.01,(1.-tc.x)-tc.y));
     s = (1. - pow(exp(-pow(radius-r, 2.) / sr),3.) * shadow);
 
-    return color - vec4(1, 1, 1, 0) * (1-s);
+    return color * s;
   }
   ]]
+  
   local ssend = self.shader.send
   getmetatable(self.shader).send = function(self, ...) pcall(ssend, self, ...) end
   self.shader:send("radius", math.max(width*height))
