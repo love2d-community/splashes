@@ -117,25 +117,43 @@ function splashlib.new()
   local ssend3 = self.logoshader.send
   getmetatable(self.logoshader).send = function(self, ...) pcall(ssend3, self, ...) end
 
-  self.shader:send("radius", math.max(width*height))
-  self.shader:send("blur", 1)
-  self.shader:send("shadow", 0.2)
+  self.shader:send("radius",  width*height)
+  self.shader:send('lighten', 0.0)
+  self.shader:send("blur",    1.0)
+  self.shader:send("shadow",  0.2)
+
+  self.textshader:send('alpha', 0.0)
+
+  self.logoshader:send('pen',   0.0)
 
   self.canvas = love.graphics.newCanvas()
 
   self.heart = {
     sprite = love.graphics.newImage(current_folder .. "/heart.png"),
-    scale = 0,
-    rot = 0
+    scale  = 0.0,
+    rot    = 0.0
   }
 
   self.stripes = {
-    rot = 0,
-    height = 100,
-    offset = -2 * width,
-    radius = math.max(width, height),
-    shadow = 0,
+    rot     = 0.0,
+    height  = 100,
+    offset  = -2 * width,
+    radius  = math.max(width, height),
+    lighten = 0.0,
+    shadow  = 0.0,
   }
+
+  self.text = {
+    obj   = love.graphics.newText(love.graphics.newFont(current_folder .. "/Handy_Andy.otf",22), "made with"),
+    alpha = 0.0
+  }
+
+  self.logo = {
+    sprite = love.graphics.newImage(current_folder .. "/Love-logo-512x256.png"),
+    mask   = love.graphics.newImage(current_folder .. "/Love-logo-512x256-mask.png"),
+    pen    = 0.0
+  }
+  logoshader:send('mask',logo.mask)
 
 
   timer.clear()
