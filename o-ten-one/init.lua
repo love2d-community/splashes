@@ -1,5 +1,5 @@
 local splashlib = {
-  _VERSION     = "v1.0.2",
+  _VERSION     = "v1.1.0",
   _DESCRIPTION = "a 0.10.1 splash",
   _URL         = "https://github.com/love2d-community/splashes",
   _LICENSE     = [[Copyright (c) 2016 love-community members (as per git commits in repository above)
