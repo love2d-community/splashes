@@ -73,6 +73,8 @@ Splash with the new 0.10.1 (windows) logo.
   slash = lib.new({background={255,0,255}})
   ```
 
+* `lighten`: boolean, if truthy instead of shrinking the background to a circle the oustide gets lightened up.
+
 * `delay_before`: number of seconds to delay before the animation.
   Defaults to `0`.
 
