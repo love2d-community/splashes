@@ -77,6 +77,9 @@ Splash with the new 0.10.1 (windows) logo.
 
 * `lighten`: boolean, if truthy instead of shrinking the background to a circle the oustide gets lightened up.
 
+* `audio`: filename or `Source` object to play during the splash.
+  Defaults to *cv's "what is love"*
+
 * `delay_before`: number of seconds to delay before the animation.
   Defaults to `0`.
 

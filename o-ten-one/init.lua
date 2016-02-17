@@ -44,6 +44,15 @@ function splashlib.new(init)
   self.delay_before = init.delay_before or 0
   self.delay_after = init.delay_after or 0
 
+  self.audio = init.audio == nil and (current_folder .. "/cv_what-is-love.ogg") or init.audio
+  if type(self.audio) == "string" then
+    self.audio = love.audio.newSource(self.audio, "static")
+  end
+  if self.audio then
+    self.audio:rewind()
+    self.audio:play()
+  end
+
   -- radial mask shader
   self.maskshader = love.graphics.newShader((init.lighten and "#define LIGHTEN" or "") .. [[
 
@@ -224,6 +233,7 @@ function splashlib.new(init)
 
     timer.clear()
 
+    if self.audio then self.audio:stop() end
     if self.onDone then self.onDone() end
   end)
 
@@ -307,6 +317,7 @@ function splashlib:skip()
 
     timer.tween(0.3, self, {alpha = 0})
     timer.after(0.3, function ()
+      if self.audio then self.audio:stop() end
       timer.clear() -- to be safe
       if self.onDone then self.onDone() end
     end)
