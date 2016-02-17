@@ -1,8 +1,25 @@
-local o_ten_one = require "o-ten-one"
+local splashes = {
+  o_ten_one = {module="o-ten-one"},
+  o_ten_one_black = {module="o-ten-one", {0, 0, 0}},
+}
+
+local current, splash
+
+function next_splash()
+  current = next(splashes, current) or next(splashes)
+  splash = splashes[current]()
+  splash.onDone = next_splash
+end
 
 function love.load()
-  splash = o_ten_one.new()
-  splash.onDone = love.load
+  for name, splash in pairs(splashes) do
+    splash.module = require(splash.module)
+    splashes[name] = function ()
+      return splash.module.new(unpack(splash))
+    end
+  end
+
+  next_splash()
 end
 
 function love.update(dt)
@@ -11,6 +28,13 @@ end
 
 function love.draw()
   splash:draw()
+
+  -- draw with both colors so its definetely visible
+  love.graphics.setColor(255, 255, 255)
+  love.graphics.print(current, 10, 10)
+
+  love.graphics.setColor(0, 0, 0)
+  love.graphics.print(current, 10, love.graphics.getHeight() - 20)
 end
 
 function love.keypressed(key)

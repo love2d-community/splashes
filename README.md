@@ -2,6 +2,9 @@ splashes [![join on gitter](https://badges.gitter.im/love2d-community/splashes.s
 ========
 A collection of splash screens for LÖVE.
 
+Run this repo with `love .` to check out all splash screens.
+Press any key to skip ahead.
+
 Usage
 -----
 Pick the splash you want to use from our wide variety of **1** (*one*) splashes and move the directory somewhere into your project.
