@@ -36,7 +36,8 @@ Splash Interface
 The library only has one function you should use:
 
 ### `lib.new(...)`
-Instantiate a new `splash`. You can also do this by calling the library itself: `lib(...)`.
+Instantiate a new `splash`.
+You can also do this by calling the library itself: `lib(...)`.
 Accepts a table with parameters depending on the specific splash (see below).
 
 The following members of the `splash` variable are of importance to you as a user:
@@ -62,7 +63,8 @@ Splashes
 Splash with the new 0.10.1 (windows) logo.
 
 `new()` parameters:
-* `background`: `{r,g,b,a}` table used to clear the screen with. Set to `false` to draw underneath.
+* `background`: `{r,g,b,a}` table used to clear the screen with.
+  Set to `false` to draw underneath.
 
 Example: _Setting a pink background color_
 

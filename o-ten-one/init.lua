@@ -219,24 +219,23 @@ function splashlib:draw()
     love.graphics.push()
     love.graphics.rotate(self.stripes.rot)
     love.graphics.setColor(colors.pink)
-    love.graphics.rectangle("fill",
-      self.stripes.offset - width,
-      -self.stripes.height,
-      width * 2,
-      self.stripes.height)
+    love.graphics.rectangle(
+      "fill",
+      self.stripes.offset - width, -self.stripes.height,
+      width * 2, self.stripes.height
+    )
 
     love.graphics.setColor(colors.blue)
-    love.graphics.rectangle("line",
-      -width - self.stripes.offset,
-      0,
-      width * 2,
-      self.stripes.height) -- draw line for anti aliasing
-    love.graphics.rectangle("fill",
-      -width - self.stripes.offset,
-      0,
-      width * 2,
-      self.stripes.height)
-
+    love.graphics.rectangle(
+      "line", -- draw line for anti aliasing
+      -width - self.stripes.offset, 0,
+      width * 2, self.stripes.height
+    )
+    love.graphics.rectangle(
+      "fill",
+      -width - self.stripes.offset, 0,
+      width * 2, self.stripes.height
+    )
     love.graphics.pop()
 
     love.graphics.setColor(255, 255, 255, 255*self.heart.scale)
@@ -251,7 +250,8 @@ function splashlib:draw()
 
   love.graphics.push()
   love.graphics.setShader(self.textshader)
-  love.graphics.draw(self.text.obj,
+  love.graphics.draw(
+    self.text.obj,
     (width  / 2) - (self.text.width   / 2),
     (height / 2) - (self.text.height  / 2) + (height / 10) + 62
   )
@@ -259,7 +259,8 @@ function splashlib:draw()
 
   love.graphics.push()
   love.graphics.setShader(self.logoshader)
-  love.graphics.draw(self.logo.sprite,
+  love.graphics.draw(
+    self.logo.sprite,
     (width  / 2) - (self.logo.width   / 4),
     (height / 2) + (self.logo.height  / 4) + (height / 10),
     0, 0.5, 0.5
