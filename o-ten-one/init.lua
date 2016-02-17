@@ -35,11 +35,12 @@ local colors = {
   shadow = {   0,   0,   0, 255 / 3 }
 }
 
-function splashlib.new(bg)
+function splashlib.new(init)
+  local init = init or {}
   local self = {}
   local width, height = love.graphics.getDimensions()
 
-  self.bg = bg == nil and colors.bg or bg
+  self.bg = init.bg or colors.bg
 
   -- radial mask shader
   self.shader = love.graphics.newShader[[
@@ -282,5 +283,7 @@ function splashlib:skip()
     end)
   end
 end
+
+setmetatable(splashlib, { __call = function(self) return self.new() end })
 
 return splashlib

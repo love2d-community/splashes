@@ -14,7 +14,7 @@ Make sure to hook the love callbacks up to `splash:update(dt)` and `splash:draw(
     local splash = require "o-ten-one"
     
     function love.load()
-      splash = o_ten_one.new()
+      splash = o_ten_one()
       splash.onDone = function() print "DONE" end
     end
     
@@ -36,7 +36,7 @@ Splash Interface
 The library only has one function you should use:
 
 ### `lib.new(...)`
-Instantiate a new `splash`.
+Instantiate a new `splash`. You can also do this by calling the library itself: `lib(...)`.
 Parameters depend on the specific splash (see below).
 
 The following members of the `splash` variable are of importance to you as a user:
@@ -63,3 +63,9 @@ Splash with the new 0.10.1 (windows) logo.
 
 `new()` parameters:
 * `background`: `{r,g,b,a}` table used to clear the screen with. Set to `false` to draw underneath.
+
+Example: _Default the background to pink:_
+
+```lua
+slash = lib.new({background={255,0,255}})
+```
