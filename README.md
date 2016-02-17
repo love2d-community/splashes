@@ -11,24 +11,26 @@ Pick the splash you want to use from our wide variety of **1** (*one*) splashes 
 Require the file and instantiate the splash using `splash.new()`.
 Make sure to hook the love callbacks up to `splash:update(dt)` and `splash:draw()` and call `splash:skip()` to let the player skip the splash.
 
-    local splash = require "o-ten-one"
-    
-    function love.load()
-      splash = o_ten_one()
-      splash.onDone = function() print "DONE" end
-    end
-    
-    function love.update(dt)
-      splash.update(dt)
-    end
-    
-    funciton love.draw()
-      splash.draw()
-    end
-    
-    function love.keypressed()
-      splash:skip()
-    end
+```lua
+local splash = require "o-ten-one"
+
+function love.load()
+  splash = o_ten_one()
+  splash.onDone = function() print "DONE" end
+end
+
+function love.update(dt)
+  splash.update(dt)
+end
+
+funciton love.draw()
+  splash.draw()
+end
+
+function love.keypressed()
+  splash:skip()
+end
+```
 
 Splash Interface
 ----------------
@@ -70,7 +72,7 @@ Splash with the new 0.10.1 (windows) logo.
   Example: _Setting a pink background color_
 
   ```lua
-  slash = lib.new({background={255,0,255}})
+  splash = lib.new({background={255,0,255}})
   ```
 
 * `lighten`: boolean, if truthy instead of shrinking the background to a circle the oustide gets lightened up.
