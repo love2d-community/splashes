@@ -15,7 +15,7 @@ function love.load()
   for name, splash in pairs(splashes) do
     splash.module = require(splash.module)
     splashes[name] = function ()
-      return splash.module.new(unpack(splash))
+      return splash.module(unpack(splash))
     end
   end
 
