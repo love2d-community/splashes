@@ -28,11 +28,11 @@ local current_folder = (...):gsub("%.[^%.]+$", "")
 local timer = require(current_folder..".timer")
 
 local colors = {
-  bg =     { 141, 178, 210, 255 },
-  white =  { 255, 255, 255, 255 },
-  blue =   {  39, 170, 225, 255 },
-  pink =   { 231,  74, 153, 255 },
-  shadow = {   0,   0,   0, 255 / 3 }
+  bg =     {108, 190, 228},
+  white =  {255, 255, 255},
+  blue =   { 39, 170, 225},
+  pink =   {231,  74, 153},
+  shadow = {0, 0, 0, 255/3}
 }
 
 function splashlib.new(init)
@@ -40,13 +40,20 @@ function splashlib.new(init)
   local self = {}
   local width, height = love.graphics.getDimensions()
 
-  self.bg = init.background == nil and colors.bg or init.background
+  self.background = init.background == nil and colors.bg or init.background
 
   -- radial mask shader
-  self.shader = love.graphics.newShader[[
+  self.maskshader = love.graphics.newShader((init.lighten and "#define LIGHTEN" or "") .. [[
+
   extern number radius;
   extern number blur;
   extern number shadow;
+  extern number lighten;
+
+  vec4 desat(vec4 color) {
+    number g = dot(vec3(.299, .587, .114), color.rgb);
+    return vec4(g, g, g, 1.0) * lighten;
+  }
 
   vec4 effect(vec4 global_color, Image canvas, vec2 tc, vec2 _)
   {
@@ -54,7 +61,12 @@ function splashlib.new(init)
     vec4 color = Texel(canvas, tc);
     number r = length((tc - vec2(.5)) * love_ScreenSize.xy);
     number s = smoothstep(radius+blur, radius-blur, r);
-    color.a *= s * global_color.a;
+    #ifdef LIGHTEN
+    color = color + desat(color) * (1-s);
+    #else
+    color.a *= s;
+    #endif
+    color.a *= global_color.a;
 
     // add shadow on lower diagonal along the circle
     number sr = 7. * (1. - smoothstep(-.1,.04,(1.-tc.x)-tc.y));
@@ -62,7 +74,13 @@ function splashlib.new(init)
 
     return color - vec4(1, 1, 1, 0) * (1-s);
   }
-  ]]
+  ]])
+
+  -- patch shader:send if 'lighten' gets optimized away
+  do
+    local _send = self.maskshader.send
+    getmetatable(self.maskshader).send = function (...) pcall(_send, ...) end
+  end
 
   -- this shader makes the text appear from left to right
   self.textshader = love.graphics.newShader[[
@@ -117,6 +135,7 @@ function splashlib.new(init)
     height  = 100,
     offset  = -2 * width,
     radius  = math.max(width, height),
+    lighten = 0,
     shadow  = 0,
   }
 
@@ -133,9 +152,10 @@ function splashlib.new(init)
   }
   self.logo.width, self.logo.height = self.logo.sprite:getDimensions()
 
-  self.shader:send("radius",  width*height)
-  self.shader:send("blur",    1)
-  self.shader:send("shadow",  2)
+  self.maskshader:send("radius",  width*height)
+  self.maskshader:send("lighten", 0)
+  self.maskshader:send("shadow",  0)
+  self.maskshader:send("blur",    1)
 
   self.textshader:send("alpha", 0)
 
@@ -153,19 +173,21 @@ function splashlib.new(init)
 
     -- hackety hack: execute timer to update shader every frame
     local haenker = timer.every(0, function()
-      self.shader:send("radius", self.stripes.radius)
-      self.shader:send("shadow", self.stripes.shadow)
-      self.textshader:send("alpha", self.text.alpha)
-      self.logoshader:send("pen",   self.logo.pen)
+      self.maskshader:send("radius",  self.stripes.radius)
+      self.maskshader:send("lighten", self.stripes.lighten)
+      self.maskshader:send("shadow",  self.stripes.shadow)
+      self.textshader:send("alpha",   self.text.alpha)
+      self.logoshader:send("pen",     self.logo.pen)
     end)
 
     -- focus the heart, desaturate the rest
-    timer.tween(0.2, self.stripes, {radius = 170})
+    timer.tween(0.2, self.stripes, {radius  = 170})
+    timer.tween(0.4, self.stripes, {lighten = .06}, "quad")
     wait(0.2)
 
-    timer.tween(0.2, self.stripes, {radius = 70}, "out-back")
-    timer.tween(0.7, self.stripes, {shadow = .3}, "back") -- @TODO 0.4?
-    timer.tween(0.8, self.heart, {scale = 1}, "out-elastic", nil, 1, 0.3)
+    timer.tween(0.2, self.stripes,  {radius = 70}, "out-back")
+    timer.tween(0.7, self.stripes,  {shadow = .3}, "back")
+    timer.tween(0.8, self.heart,    {scale  =  1}, "out-elastic", nil, 1, 0.3)
 
     -- write out the text
     timer.tween(.75, self.text, {alpha = 1}, "linear")
@@ -209,8 +231,8 @@ end
 function splashlib:draw()
   local width, height = love.graphics.getDimensions()
 
-  if self.bg then
-    love.graphics.clear(self.bg)
+  if self.background then
+    love.graphics.clear(self.background)
   end
   self.canvas:renderTo(function()
     love.graphics.push()
@@ -244,7 +266,7 @@ function splashlib:draw()
   end)
 
   love.graphics.setColor(255, 255, 255, 255*self.alpha)
-  love.graphics.setShader(self.shader)
+  love.graphics.setShader(self.maskshader)
   love.graphics.draw(self.canvas, 0,0)
   love.graphics.setShader()
 
