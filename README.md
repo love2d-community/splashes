@@ -63,6 +63,7 @@ Splashes
 Splash with the new 0.10.1 (windows) logo.
 
 `new()` parameters:
+
 * `background`: `{r,g,b,a}` table used to clear the screen with.
   Set to `false` to draw underneath.
 
@@ -71,3 +72,9 @@ Example: _Setting a pink background color_
 ```lua
 slash = lib.new({background={255,0,255}})
 ```
+
+* `delay_before`: number of seconds to delay before the animation.
+  Defaults to `0`.
+
+* `delay_after`: number of seconds to delay before the animation.
+  Defaults to `0`.

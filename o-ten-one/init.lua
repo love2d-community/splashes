@@ -41,6 +41,8 @@ function splashlib.new(init)
   local width, height = love.graphics.getDimensions()
 
   self.bg = init.background == nil and colors.bg or init.background
+  self.delay_before = init.delay_before or 0
+  self.delay_after = init.delay_after or 0
 
   -- radial mask shader
   self.shader = love.graphics.newShader[[
@@ -144,6 +146,9 @@ function splashlib.new(init)
 
   timer.clear()
   timer.script(function(wait)
+
+    wait(self.delay_before)
+
     -- roll in stripes
     timer.tween(0.5, self.stripes, {offset = 0})
     wait(0.3)
@@ -189,6 +194,7 @@ function splashlib.new(init)
     wait(0.4)
 
     -- no more skipping
+    wait(self.delay_after)
     self.done = true
 
     timer.tween(0.3, self, {alpha = 0})
