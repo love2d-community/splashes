@@ -1,6 +1,8 @@
 local splashes = {
   o_ten_one = {module="o-ten-one"},
   o_ten_one_black = {module="o-ten-one", {background={0, 0, 0}}},
+  o_ten_one_delay_before = {module="o-ten-one", {delay_before = 1}},
+  o_ten_one_delay_after = {module="o-ten-one", {delay_after = 1}},
 }
 
 local current, splash
