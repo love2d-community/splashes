@@ -283,4 +283,6 @@ function splashlib:skip()
   end
 end
 
+setmetatable(splashlib, { __call = function(self) return self.new() end })
+
 return splashlib
