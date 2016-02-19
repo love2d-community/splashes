@@ -1,5 +1,5 @@
 local splashlib = {
-  _VERSION     = "v1.1.0",
+  _VERSION     = "v1.2.0",
   _DESCRIPTION = "a 0.10.1 splash",
   _URL         = "https://github.com/love2d-community/splashes",
   _LICENSE     = [[Copyright (c) 2016 love-community members (as per git commits in repository above)
@@ -41,11 +41,77 @@ function splashlib.new(init)
   local width, height = love.graphics.getDimensions()
 
   self.background = init.background == nil and colors.bg or init.background
-  self.delay_before = init.delay_before or 0
-  self.delay_after = init.delay_after or 0
+  self.delay_before = init.delay_before or 0.3
+  self.delay_after = init.delay_after or 0.7
+
+  if init.fill == "rain" then
+    local rain = {}
+    rain.spacing_x = 110
+    rain.spacing_y = 80
+    rain.image = love.graphics.newImage(current_folder .. "/baby.png")
+    rain.img_w = rain.image:getWidth()
+    rain.img_h = rain.image:getHeight()
+    rain.ox = -rain.img_w / 2
+    rain.oy = -rain.img_h / 2
+    rain.batch = love.graphics.newSpriteBatch(rain.image, 512)
+    rain.t = 0
+
+    local gradient = love.graphics.newMesh({
+      {    0, height/4, 0, 0,  0, 0, 0,   0},
+      {width, height/4, 0, 0,  0, 0, 0,   0},
+      {width, height,   0, 0,  0, 0, 0, 200},
+      {    0, height,   0, 0,  0, 0, 0, 200},
+    }, "fan", "static")
+    do
+      local batch = rain.batch
+
+      local sx = rain.spacing_x
+      local sy = rain.spacing_y
+      local ox = rain.ox
+      local oy = rain.oy
+
+      local batch_w = 2 * math.ceil(love.graphics.getWidth() / sx) + 2
+      local batch_h = 2 * math.ceil(love.graphics.getHeight() / sy) + 2
+
+      batch:clear()
+
+      if batch:getBufferSize() < batch_w * batch_h then
+        batch:setBufferSize(batch_w * batch_h)
+      end
+
+      for i = 0, batch_h - 1 do
+        for j = 0, batch_w - 1 do
+          local is_even = (j % 2) == 0
+          local offset_y = is_even and 0 or sy / 2
+          local x = ox + j * sx
+          local y = oy + i * sy + offset_y
+          batch:add(x, y)
+        end
+      end
+
+      batch:flush()
+    end
+
+    function self:fill()
+      local y = rain.spacing_y * select(2, math.modf(self.elapsed))
+
+      local small_y = -rain.spacing_y + y / 2
+      local big_y = -rain.spacing_y + y
+
+      love.graphics.setBlendMode("subtract")
+      love.graphics.setColor(255, 255, 255, 128)
+      love.graphics.draw(rain.batch, -rain.spacing_x, small_y, 0, 0.5, 0.5)
+
+      love.graphics.setBlendMode("alpha")
+      love.graphics.setColor(208, 208, 208, 255)
+      love.graphics.draw(rain.batch, -rain.spacing_x, big_y)
+
+      love.graphics.draw(gradient)
+    end
+  end
 
   -- radial mask shader
-  self.maskshader = love.graphics.newShader((init.lighten and "#define LIGHTEN" or "") .. [[
+  self.maskshader = love.graphics.newShader((init.fill == "lighten" and "#define LIGHTEN" or "") .. [[
 
   extern number radius;
   extern number blur;
@@ -125,6 +191,7 @@ function splashlib.new(init)
 
   self.canvas = love.graphics.newCanvas()
 
+  self.elapsed = 0
   self.alpha = 1
   self.heart = {
     sprite = love.graphics.newImage(current_folder .. "/heart.png"),
@@ -240,6 +307,11 @@ function splashlib:draw()
   if self.background then
     love.graphics.clear(self.background)
   end
+
+  if self.fill and self.elapsed > self.delay_before + 0.6 then
+    self:fill()
+  end
+
   self.canvas:renderTo(function()
     love.graphics.push()
     love.graphics.translate(width / 2, height / 2)
@@ -299,6 +371,7 @@ end
 
 function splashlib:update(dt)
   timer.update(dt)
+  self.elapsed = self.elapsed + dt
 end
 
 function splashlib:skip()

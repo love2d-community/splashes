@@ -1,7 +1,8 @@
 local splashes = {
-  ["o-ten-one"] = {module="o-ten-one"},
-  ["o-ten-one: lighten"] = {module="o-ten-one", {lighten=true}},
-  ["o-ten-one: black"] = {module="o-ten-one", {background={0, 0, 0}}},
+  ["o-ten-one"]           = {module="o-ten-one"},
+  ["o-ten-one: lighten"]  = {module="o-ten-one", {fill="lighten"}},
+  ["o-ten-one: rain"]     = {module="o-ten-one", {fill="rain"}},
+  ["o-ten-one: black"]    = {module="o-ten-one", {background={0, 0, 0}}},
 }
 
 local current, splash

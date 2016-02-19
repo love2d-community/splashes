@@ -75,7 +75,8 @@ Splash with the new 0.10.1 (windows) logo.
   splash = lib.new({background={255,0,255}})
   ```
 
-* `lighten`: boolean, if truthy instead of shrinking the background to a circle the oustide gets lightened up.
+* `fill`: Whether and how to fill the background in the second animation stage.
+  One of `"rain"` (fill with baby-inspector rain) or `"lighten"` (keep pink/blue stripes but lighten outside)
 
 * `delay_before`: number of seconds to delay before the animation.
   Defaults to `0`.
