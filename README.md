@@ -1,4 +1,4 @@
-splashes [![join on gitter](https://badges.gitter.im/love2d-community/splashes.svg)](https://gitter.im/love2d-community/splashes)
+splashes [![join on gitter](https://badges.gitter.im/love2d-community/splashes.svg)](https://gitter.im/love2d-community/splashes) [![LOVE](https://img.shields.io/badge/L%C3%96VE-0.10.1-EA316E.svg)](http://love2d.org/)
 ========
 A collection of splash screens for LÖVE.
 
