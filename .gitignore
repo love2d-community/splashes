@@ -1,0 +1,2 @@
+*.love
+.travis/deploy_key.pem

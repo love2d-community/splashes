@@ -43,5 +43,6 @@ function love.keypressed(key)
   if key == "escape" then
     love.event.push("quit")
   end
+
   splash:skip()
 end
