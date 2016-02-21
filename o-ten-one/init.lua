@@ -130,7 +130,7 @@ function splashlib.new(init)
     number r = length((tc - vec2(.5)) * love_ScreenSize.xy);
     number s = smoothstep(radius+blur, radius-blur, r);
     #ifdef LIGHTEN
-    color = color + desat(color) * (1-s);
+    color = color + desat(color) * (1.0-s);
     #else
     color.a *= s;
     #endif
@@ -140,7 +140,7 @@ function splashlib.new(init)
     number sr = 7. * (1. - smoothstep(-.1,.04,(1.-tc.x)-tc.y));
     s = (1. - pow(exp(-pow(radius-r, 2.) / sr),3.) * shadow);
 
-    return color - vec4(1, 1, 1, 0) * (1-s);
+    return color - vec4(1, 1, 1, 0) * (1.0-s);
   }
   ]])
 
