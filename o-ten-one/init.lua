@@ -147,7 +147,11 @@ function splashlib.new(init)
   -- patch shader:send if 'lighten' gets optimized away
   do
     local _send = self.maskshader.send
-    getmetatable(self.maskshader).send = function (...) pcall(_send, ...) end
+    getmetatable(self.maskshader).send = function (self, name, ...)
+      if self:getExternVariable(name) then
+        _send(self, name, ...)
+      end
+    end
   end
 
   -- this shader makes the text appear from left to right
