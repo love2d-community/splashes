@@ -23,7 +23,7 @@ function love.update(dt)
   splash.update(dt)
 end
 
-funciton love.draw()
+function love.draw()
   splash.draw()
 end
 
