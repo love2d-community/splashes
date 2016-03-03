@@ -145,12 +145,9 @@ function splashlib.new(init)
   ]])
 
   -- patch shader:send if 'lighten' gets optimized away
-  do
-    local _send = self.maskshader.send
-    getmetatable(self.maskshader).send = function (self, name, ...)
-      if self:getExternVariable(name) then
-        _send(self, name, ...)
-      end
+  safesend = function (shader, name, ...)
+    if shader:getExternVariable(name) then
+      shader:send(name, ...)
     end
   end
 
@@ -225,15 +222,15 @@ function splashlib.new(init)
   }
   self.logo.width, self.logo.height = self.logo.sprite:getDimensions()
 
-  self.maskshader:send("radius",  width*height)
-  self.maskshader:send("lighten", 0)
-  self.maskshader:send("shadow",  0)
-  self.maskshader:send("blur",    1)
+  safesend(self.maskshader, "radius",  width*height)
+  safesend(self.maskshader, "lighten", 0)
+  safesend(self.maskshader, "shadow",  0)
+  safesend(self.maskshader, "blur",    1)
 
-  self.textshader:send("alpha", 0)
+  safesend(self.textshader, "alpha", 0)
 
-  self.logoshader:send("pen", 0)
-  self.logoshader:send("mask", self.logo.mask)
+  safesend(self.logoshader, "pen", 0)
+  safesend(self.logoshader, "mask", self.logo.mask)
 
   timer.clear()
   timer.script(function(wait)
@@ -249,11 +246,11 @@ function splashlib.new(init)
 
     -- hackety hack: execute timer to update shader every frame
     local haenker = timer.every(0, function()
-      self.maskshader:send("radius",  self.stripes.radius)
-      self.maskshader:send("lighten", self.stripes.lighten)
-      self.maskshader:send("shadow",  self.stripes.shadow)
-      self.textshader:send("alpha",   self.text.alpha)
-      self.logoshader:send("pen",     self.logo.pen)
+      safesend(self.maskshader, "radius",  self.stripes.radius)
+      safesend(self.maskshader, "lighten", self.stripes.lighten)
+      safesend(self.maskshader, "shadow",  self.stripes.shadow)
+      safesend(self.textshader, "alpha",   self.text.alpha)
+      safesend(self.logoshader, "pen",     self.logo.pen)
     end)
 
     -- focus the heart, desaturate the rest
