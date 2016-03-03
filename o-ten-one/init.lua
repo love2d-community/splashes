@@ -23,9 +23,10 @@ freely, subject to the following restrictions:
 The font used in this splash is "Handy Andy" by www.andrzejgdula.com]]
 }
 
-local current_folder = (...):gsub("%.[^%.]+$", "")
+local current_module = (...):gsub("%. init$", "")
+local current_folder = current_module:gsub("%.", "/")
 
-local timer = require(current_folder..".timer")
+local timer = require(current_module .. ".timer")
 
 local colors = {
   bg =     {108, 190, 228},
