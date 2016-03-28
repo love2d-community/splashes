@@ -36,8 +36,15 @@ local colors = {
   shadow = {0, 0, 0, 255/3}
 }
 
+-- patch shader:send if 'lighten' gets optimized away
+local function safesend(shader, name, ...)
+  if shader:getExternVariable(name) then
+    shader:send(name, ...)
+  end
+end
+
 function splashlib.new(init)
-  local init = init or {}
+  init = init or {}
   local self = {}
   local width, height = love.graphics.getDimensions()
 
@@ -93,7 +100,7 @@ function splashlib.new(init)
       batch:flush()
     end
 
-    function self:fill()
+    function self.fill()
       local y = rain.spacing_y * select(2, math.modf(self.elapsed))
 
       local small_y = -rain.spacing_y + y / 2
@@ -144,13 +151,6 @@ function splashlib.new(init)
     return color - vec4(1, 1, 1, 0) * (1.0-s);
   }
   ]])
-
-  -- patch shader:send if 'lighten' gets optimized away
-  safesend = function (shader, name, ...)
-    if shader:getExternVariable(name) then
-      shader:send(name, ...)
-    end
-  end
 
   -- this shader makes the text appear from left to right
   self.textshader = love.graphics.newShader[[
@@ -246,7 +246,7 @@ function splashlib.new(init)
     wait(0.2)
 
     -- hackety hack: execute timer to update shader every frame
-    local haenker = timer.every(0, function()
+    timer.every(0, function()
       safesend(self.maskshader, "radius",  self.stripes.radius)
       safesend(self.maskshader, "lighten", self.stripes.lighten)
       safesend(self.maskshader, "shadow",  self.stripes.shadow)
@@ -269,7 +269,7 @@ function splashlib.new(init)
     -- draw out the logo, in parts
     local mult = 0.65
     local function tween_and_wait(dur, pen, easing)
-      timer.tween(mult * dur, self.logo, {pen = pen/255}, "in-quad")
+      timer.tween(mult * dur, self.logo, {pen = pen/255}, easing)
       wait(mult * dur)
     end
     tween_and_wait(0.175,  50, "in-quad")     -- L
