@@ -7,17 +7,17 @@ local splashes = {
 
 local current, splash
 
-function next_splash()
+local function next_splash()
   current = next(splashes, current) or next(splashes)
   splash = splashes[current]()
   splash.onDone = next_splash
 end
 
 function love.load()
-  for name, splash in pairs(splashes) do
-    splash.module = require(splash.module)
+  for name, entry in pairs(splashes) do
+    entry.module = require(entry.module)
     splashes[name] = function ()
-      return splash.module(unpack(splash))
+      return entry.module(unpack(entry))
     end
   end
 
