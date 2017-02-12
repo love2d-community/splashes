@@ -23,7 +23,7 @@ freely, subject to the following restrictions:
 The font used in this splash is "Handy Andy" by www.andrzejgdula.com]]
 }
 
-local current_module = (...):gsub("%. init$", "")
+local current_module = (...):gsub("%.init$", "")
 local current_folder = current_module:gsub("%.", "/")
 
 local timer = require(current_module .. ".timer")
