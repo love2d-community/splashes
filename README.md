@@ -20,11 +20,11 @@ function love.load()
 end
 
 function love.update(dt)
-  splash.update(dt)
+  splash:update(dt)
 end
 
 function love.draw()
-  splash.draw()
+  splash:draw()
 end
 
 function love.keypressed()
