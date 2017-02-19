@@ -12,7 +12,7 @@ Require the file and instantiate the splash using `splash.new()`.
 Make sure to hook the love callbacks up to `splash:update(dt)` and `splash:draw()` and call `splash:skip()` to let the player skip the splash.
 
 ```lua
-local splash = require "o-ten-one"
+local o_ten_one = require "o-ten-one"
 
 function love.load()
   splash = o_ten_one()
