@@ -29,16 +29,16 @@ local current_folder = current_module:gsub("%.", "/")
 local timer = require(current_module .. ".timer")
 
 local colors = {
-  bg =     {108, 190, 228},
-  white =  {255, 255, 255},
-  blue =   { 39, 170, 225},
-  pink =   {231,  74, 153},
-  shadow = {0, 0, 0, 255/3}
+  bg =     {.42, .75, .89},
+  white =  {  1,   1,   1},
+  blue =   {.15, .67, .88},
+  pink =   {.91, .29,  .6},
+  shadow = {0, 0, 0, .33}
 }
 
 -- patch shader:send if 'lighten' gets optimized away
 local function safesend(shader, name, ...)
-  if shader:getExternVariable(name) then
+  if shader:hasUniform(name) then
     shader:send(name, ...)
   end
 end
@@ -107,11 +107,11 @@ function splashlib.new(init)
       local big_y = -rain.spacing_y + y
 
       love.graphics.setBlendMode("subtract")
-      love.graphics.setColor(255, 255, 255, 128)
+      love.graphics.setColor(1, 1, 1, .5)
       love.graphics.draw(rain.batch, -rain.spacing_x, small_y, 0, 0.5, 0.5)
 
       love.graphics.setBlendMode("alpha")
-      love.graphics.setColor(208, 208, 208, 255)
+      love.graphics.setColor(.81, .81, .81, 1)
       love.graphics.draw(rain.batch, -rain.spacing_x, big_y)
 
       love.graphics.draw(gradient)
@@ -340,12 +340,12 @@ function splashlib:draw()
     )
     love.graphics.pop()
 
-    love.graphics.setColor(255, 255, 255, 255*self.heart.scale)
+    love.graphics.setColor(1, 1, 1, self.heart.scale)
     love.graphics.draw(self.heart.sprite, 0, 5, self.heart.rot, self.heart.scale, self.heart.scale, 43, 39)
     love.graphics.pop()
   end)
 
-  love.graphics.setColor(255, 255, 255, 255*self.alpha)
+  love.graphics.setColor(1, 1, 1, self.alpha)
   love.graphics.setShader(self.maskshader)
   love.graphics.draw(self.canvas, 0,0)
   love.graphics.setShader()
