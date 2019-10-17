@@ -255,11 +255,11 @@ function splashlib.new(init)
     end)
 
     -- focus the heart, desaturate the rest
-    timer.tween(0.2, self.stripes, {radius  = 170})
+    timer.tween(0.2, self.stripes, {radius  = 170*love.graphics.getDPIScale()})
     timer.tween(0.4, self.stripes, {lighten = .06}, "quad")
     wait(0.2)
 
-    timer.tween(0.2, self.stripes,  {radius = 70}, "out-back")
+    timer.tween(0.2, self.stripes,  {radius = 70*love.graphics.getDPIScale()}, "out-back")
     timer.tween(0.7, self.stripes,  {shadow = .3}, "back")
     timer.tween(0.8, self.heart,    {scale  =  1}, "out-elastic", nil, 1, 0.3)
 
