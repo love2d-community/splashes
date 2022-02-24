@@ -83,7 +83,10 @@ function splashlib.new(init)
 
       batch:clear()
 
-      if batch:getBufferSize() < batch_w * batch_h then
+      -- Love 11.0 Removed SpriteBatch:setBufferSize, spritebatches now automatically grow when they run out of space.
+      -- https://love2d.org/wiki/SpriteBatch:setBufferSize
+      local major, minor = love.getVersion()
+      if major == 0 and minor < 11 and batch:getBufferSize() < batch_w * batch_h then
         batch:setBufferSize(batch_w * batch_h)
       end
 
