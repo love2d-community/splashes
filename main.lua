@@ -3,6 +3,7 @@ local splashes = {
   ["o-ten-one: lighten"]  = {module="o-ten-one", {fill="lighten"}},
   ["o-ten-one: rain"]     = {module="o-ten-one", {fill="rain"}},
   ["o-ten-one: black"]    = {module="o-ten-one", {background={0, 0, 0}}},
+  ["zomebody"]            = {module="zomebody"},
 }
 
 local current, splash
